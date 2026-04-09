@@ -19,13 +19,12 @@
         .loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
         .loader-brand { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; letter-spacing: 0.4em; color: var(--cream); opacity: 0; animation: loaderFadeIn 1s 0.2s forwards; }
         .loader-line { width: 120px; height: 1px; background: var(--wood-light); margin-top: 2rem; transform: scaleX(0); transform-origin: left; animation: loaderLine 1.8s 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
-        .loader-sub { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--wood-light); margin-top: 1rem; opacity: 0; animation: loaderFadeIn 0.8s 1s forwards; }
+        .loader-sub { font-size: 0.65rem; letter-spacing: 0.25em; color: var(--wood-light); margin-top: 1rem; opacity: 0; animation: loaderFadeIn 0.8s 1s forwards; }
         @keyframes loaderFadeIn { to { opacity: 1; } }
         @keyframes loaderLine { to { transform: scaleX(1); } }
 
         /* ========== FILM GRAIN ========== */
-        .grain { position: fixed; inset: 0; z-index: 999; pointer-events: none; opacity: 0.035; }
-        .grain canvas { width: 100%; height: 100%; }
+        .grain { display: none; }
 
         /* ========== SCROLL PROGRESS ========== */
         .scroll-progress { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--wood), var(--green)); z-index: 200; transform-origin: left; transform: scaleX(0); }
@@ -38,7 +37,7 @@
         .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 500; letter-spacing: 0.3em; color: var(--white); text-decoration: none; transition: color 0.5s; }
         nav.scrolled .nav-logo { color: var(--dark); }
         .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-        .nav-links a { font-size: 0.75rem; font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.5s; position: relative; }
+        .nav-links a { font-size: 0.75rem; font-weight: 400; letter-spacing: 0.15em; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.5s; position: relative; }
         .nav-links a::after { content:''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: currentColor; transition: width 0.3s; }
         .nav-links a:hover::after { width: 100%; }
         nav.scrolled .nav-links a { color: var(--text-light); }
@@ -57,14 +56,14 @@
         .split-text .char.visible { opacity: 1; transform: translateY(0) rotateX(0); }
         .split-text .space { display: inline-block; width: 0.3em; }
 
-        .hero-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 1.25rem; opacity: 0; transform: translateY(20px); }
+        .hero-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.35em; color: rgba(255,255,255,0.6); margin-bottom: 1.25rem; opacity: 0; transform: translateY(20px); }
         .hero-label.anim { animation: fadeUp 1s forwards; }
         .hero-title { font-size: clamp(2.5rem, 6.5vw, 7rem); font-weight: 300; color: var(--white); letter-spacing: 0.05em; margin-bottom: 1.25rem; perspective: 600px; white-space: nowrap; }
         .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.1rem, 2.2vw, 1.5rem); font-weight: 300; font-style: italic; color: rgba(255,255,255,0.8); line-height: 1.5; opacity: 0; transform: translateY(20px); }
         .hero-subtitle.anim { animation: fadeUp 1s 0.4s forwards; }
         .hero-scroll { position: absolute; bottom: 2rem; right: 3rem; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; opacity: 0; }
         .hero-scroll.anim { animation: fadeUp 1s 0.8s forwards; }
-        .hero-scroll span { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.5); writing-mode: vertical-rl; }
+        .hero-scroll span { font-size: 0.6rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); writing-mode: vertical-rl; }
         .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent); animation: scrollPulse 2s infinite; }
         @keyframes scrollPulse { 0%,100% { opacity:1; transform:scaleY(1); } 50% { opacity:0.3; transform:scaleY(0.6); } }
         @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
@@ -95,7 +94,7 @@
 
         .intro { padding: 8rem 3rem; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
         .intro-text { padding-right: 2rem; }
-        .section-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--wood); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+        .section-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3em; color: var(--wood); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
         .section-label::before { content:''; width: 30px; height: 1px; background: var(--wood); }
         .section-title { font-size: clamp(2rem, 3.5vw, 3rem); color: var(--dark); margin-bottom: 2rem; }
         .section-text { font-size: 0.95rem; font-weight: 300; color: var(--text-light); line-height: 1.9; }
@@ -182,7 +181,7 @@
 <div class="loader" id="loader">
     <div class="loader-brand">NOVA SLING</div>
     <div class="loader-line"></div>
-    <div class="loader-sub">Ash &amp; Linen Collection</div>
+    <div class="loader-sub">ASH &amp; LINEN COLLECTION</div>
 </div>
 
 <!-- FILM GRAIN -->
@@ -190,7 +189,7 @@
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
-<nav id="navbar"><a href="#" class="nav-logo">NOVA SLING</a><ul class="nav-links"><li><a href="#about">Tasarım</a></li><li><a href="#features">Özellikler</a></li><li><a href="#gallery">Galeri</a></li><li><a href="#sustainability">Sürdürülebilirlik</a></li></ul></nav>
+<nav id="navbar"><a href="#" class="nav-logo">NOVA SLING</a><ul class="nav-links"><li><a href="#about">TASARIM</a></li><li><a href="#features">ÖZELLIKLER</a></li><li><a href="#gallery">GALERI</a></li><li><a href="#sustainability">SÜRDÜRÜLEBILIRLIK</a></li></ul></nav>
 
 <!-- HERO -->
 <div class="scene-section" data-3d="hero">
@@ -198,11 +197,11 @@
         <div class="hero-bg"><img src="images/exhibition.png" alt="NOVA SLING" loading="eager"></div>
         <div class="hero-overlay"></div><canvas id="hero-canvas"></canvas>
         <div class="hero-content">
-            <p class="hero-label" id="heroLabel">Ash &amp; Linen Collection</p>
+            <p class="hero-label" id="heroLabel">ASH &amp; LINEN COLLECTION</p>
             <h1 class="hero-title split-text" id="heroTitle">NOVA SLING</h1>
             <p class="hero-subtitle" id="heroSub">Zamansız tasarımın ve doğal malzemenin dengesi.</p>
         </div>
-        <div class="hero-scroll" id="heroScroll"><span>Scroll</span><div class="scroll-line"></div></div>
+        <div class="hero-scroll" id="heroScroll"><span>SCROLL</span><div class="scroll-line"></div></div>
     </section>
 </div>
 
@@ -210,7 +209,7 @@
 <div class="scene-section section-cream" data-3d="tilt-right">
     <section class="intro" id="about">
         <div class="intro-text">
-            <div class="section-label fade-reveal">Tasarım Felsefesi</div>
+            <div class="section-label fade-reveal">TASARIM FELSEFESI</div>
             <div class="text-reveal"><h2 class="section-title text-reveal-inner">Minimum Form,<br>Maksimum Konfor</h2></div>
             <p class="section-text fade-reveal" data-delay="0.15">Masif dişbudak ahşap ve doğal keten kumaşın bir araya geldiği bu oturma elemanı, minimum form ile maksimum konfor sunar. Hafif, demonte yapısı sayesinde farklı yaşam alanlarına kolayca adapte olurken, sürdürülebilir malzeme seçimiyle uzun ömürlü bir kullanım deneyimi sağlar.</p>
             <br>
@@ -223,7 +222,7 @@
 <!-- FEATURES -->
 <div class="scene-section section-dark" data-3d="tilt-up">
     <section class="features" id="features"><div class="features-inner">
-        <div class="section-label fade-reveal" style="color:var(--wood-light)">Özellikler</div>
+        <div class="section-label fade-reveal" style="color:var(--wood-light)">ÖZELLIKLER</div>
         <div class="text-reveal"><h2 class="section-title text-reveal-inner" style="color:var(--cream)">Öne Çıkan<br>Tasarım Detayları</h2></div>
         <div class="features-grid">
             <div class="feature-card" data-3d-child="card"><div class="feature-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><path d="M8 40V8h4v28h24V8h4v32"/><path d="M16 16h16M16 22h16"/></svg></div><h3>Masif Dişbudak Ahşap</h3><p>Taşıyıcı sistem, dayanıklı ve doğal dokulu masif dişbudak ahşaptan üretilmiştir.</p></div>
@@ -239,7 +238,7 @@
 <!-- GALLERY -->
 <div class="scene-section section-cream" data-3d="tilt-left">
     <section class="gallery" id="gallery">
-        <div class="gallery-header"><div class="section-label fade-reveal">Galeri</div><div class="text-reveal"><h2 class="section-title text-reveal-inner">Detaylarda<br>Saklanan Hikâye</h2></div></div>
+        <div class="gallery-header"><div class="section-label fade-reveal">GALERI</div><div class="text-reveal"><h2 class="section-title text-reveal-inner">Detaylarda<br>Saklanan Hikâye</h2></div></div>
         <div class="gallery-grid">
             <div class="gallery-item span-2 img-reveal" data-3d-child="gallery"><img src="images/front-view.png" alt="NOVA SLING"><div class="gallery-item-overlay"><span>Önden görünüm</span></div></div>
             <div class="gallery-item img-reveal" data-3d-child="gallery"><img src="images/detail-view.png" alt="NOVA SLING"><div class="gallery-item-overlay"><span>Yapısal detay</span></div></div>
@@ -254,7 +253,7 @@
 <div class="scene-section section-green" data-3d="tilt-right">
     <section class="sustainability" id="sustainability"><div class="sustainability-inner">
         <div>
-            <div class="section-label fade-reveal" style="color:rgba(255,255,255,0.5)">Sürdürülebilirlik</div>
+            <div class="section-label fade-reveal" style="color:rgba(255,255,255,0.5)">SÜRDÜRÜLEBILIRLIK</div>
             <div class="text-reveal"><h2 class="section-title text-reveal-inner" style="color:var(--white)">Döngüsel Kullanım,<br>Düşük Çevresel Etki</h2></div>
             <p class="section-text fade-reveal" style="color:rgba(255,255,255,0.75)" data-delay="0.15">Doğal malzemelerle üretilen NOVA SLING, uzun ömürlü kullanım ve düşük çevresel etki prensibiyle tasarlanmıştır. Değiştirilebilir kumaş yüzeyi ve sökülebilir bağlantı sistemi sayesinde ürün, lineer tüketim yerine döngüsel kullanım modelini destekler.</p>
         </div>
