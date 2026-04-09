@@ -142,6 +142,20 @@
         .sustain-stat h4 { font-size: 1.1rem; font-weight: 400; color: var(--white); margin-bottom: 0.35rem; }
         .sustain-stat p { font-size: 0.8rem; font-weight: 300; color: rgba(255,255,255,0.55); line-height: 1.6; }
 
+        /* ========== 3D VIEWER ========== */
+        .viewer { position: relative; height: 100vh; min-height: 600px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .viewer-canvas-wrap { position: absolute; inset: 0; filter: blur(12px) brightness(0.7); transition: filter 1.2s cubic-bezier(0.4,0,0.2,1); }
+        .viewer-canvas-wrap.active { filter: blur(0px) brightness(1); }
+        #viewer-canvas { width: 100%; height: 100%; display: block; }
+        .viewer-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; transition: opacity 0.8s, visibility 0.8s; }
+        .viewer-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .viewer-overlay h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); color: var(--white); margin-bottom: 0.5rem; letter-spacing: 0.03em; }
+        .viewer-overlay p { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 2.5rem; font-weight: 300; }
+        .viewer-btn { font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 400; letter-spacing: 0.2em; color: var(--cream); background: transparent; border: 1px solid rgba(255,255,255,0.3); padding: 1rem 2.5rem; cursor: pointer; transition: all 0.4s; position: relative; overflow: hidden; }
+        .viewer-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--wood-light); color: var(--white); }
+        .viewer-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 0.65rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.35); z-index: 2; opacity: 0; transition: opacity 0.6s 0.8s; pointer-events: none; }
+        .viewer-hint.show { opacity: 1; }
+
         footer { background: var(--dark); padding: 3rem; }
         .footer-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .footer-brand { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.3em; color: var(--cream); }
@@ -216,6 +230,18 @@
             <p class="section-text fade-reveal" data-delay="0.3">NOVA SLING, geleneksel ahşap geçme tekniklerini modern bir dil ile yeniden yorumlar. Taşıyıcı ahşap strüktür ile gerilimli kumaş yüzey arasındaki ilişki, hem ergonomik hem de estetik bir oturma deneyimi oluşturur. Parçalanabilir yapısı sayesinde taşınabilir, tamir edilebilir ve yeniden üretilebilir bir ürün yaklaşımı sunar.</p>
         </div>
         <div class="intro-image img-reveal"><img src="images/side-view.png" alt="NOVA SLING"></div>
+    </section>
+</div>
+
+<!-- 3D VIEWER -->
+<div class="section-dark">
+    <section class="viewer" id="viewer">
+        <div class="viewer-canvas-wrap" id="viewerWrap"><canvas id="viewer-canvas"></canvas></div>
+        <div class="viewer-overlay" id="viewerOverlay">
+            <h2>3D Model</h2>
+            <p>Sandalyeyi her açıdan inceleyin</p>
+            <button class="viewer-btn" id="viewerBtn">YAKINDAN BAK</button>
+        </div>
     </section>
 </div>
 
@@ -399,6 +425,277 @@ requestAnimationFrame(tick);
     for(let i=0;i<12;i++){const mat=new THREE.LineBasicMaterial({color:0xA89478,transparent:true,opacity:.03+Math.random()*.06});const l=new THREE.LineSegments(eg,mat);l.position.set((Math.random()-.5)*50,(Math.random()-.5)*30,(Math.random()-.5)*20-5);l.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);l.userData={rs:(Math.random()-.5)*.004};s.add(l);blocks.push(l);}
     function anim(){requestAnimationFrame(anim);const f=Math.max(0,1-scrollY/innerHeight);c.style.opacity=f;if(f<=0)return;cam.position.x+=(mouse.nx*2-cam.position.x)*.02;cam.position.y+=(mouse.ny*1.5-cam.position.y)*.02;cam.lookAt(0,0,0);const t=performance.now()*.001;blocks.forEach(b=>{b.rotation.x+=b.userData.rs||0;b.rotation.y+=(b.userData.rs||0)*.7;if(b.userData.sx){b.position.x+=b.userData.sx;b.position.y=b.userData.by+Math.sin(t+b.position.x)*.5;if(Math.abs(b.position.x)>35)b.position.x*=-1;}});r.render(s,cam);}
     anim();addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();r.setSize(innerWidth,innerHeight);});
+})();
+
+// ==================== 3D MODEL VIEWER ====================
+(function(){
+    const canvas = document.getElementById('viewer-canvas');
+    const wrap = document.getElementById('viewerWrap');
+    const overlay = document.getElementById('viewerOverlay');
+    const btn = document.getElementById('viewerBtn');
+    const section = document.getElementById('viewer');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0x2A2420);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+    camera.position.set(2, 2, 4);
+    camera.lookAt(0, 0, 0);
+
+    // Balanced warm lighting
+    scene.add(new THREE.AmbientLight(0xFFF5EA, 0.55));
+    const dir1 = new THREE.DirectionalLight(0xFFF0DD, 0.8);
+    dir1.position.set(5, 8, 5);
+    scene.add(dir1);
+    const dir2 = new THREE.DirectionalLight(0xFFEEDD, 0.35);
+    dir2.position.set(-4, 3, -3);
+    scene.add(dir2);
+    const dir3 = new THREE.DirectionalLight(0xFFF5EE, 0.2);
+    dir3.position.set(0, -3, 4);
+    scene.add(dir3);
+
+    let model = null;
+    let autoRotate = true;
+    let isActive = false;
+    let isDragging = false;
+    let prevMouse = { x: 0, y: 0 };
+    let rotY = 0.5, rotX = 0.4;
+    let targetRotY = 0.5, targetRotX = 0.4;
+    let camDist = 4.5, targetDist = 4.5;
+
+    // Load .3ds - full multi-mesh parser
+    fetch('model.3ds').then(r => r.arrayBuffer()).then(buf => {
+        const dv = new DataView(buf);
+        const meshes = []; // {verts:[], faces:[]}
+        let currentMesh = null;
+
+        function readStr(off) { let s=''; for(let i=0;i<256;i++){const c=dv.getUint8(off+i);if(!c)break;s+=String.fromCharCode(c);}return s; }
+
+        function parse(start, end) {
+            while (start < end) {
+                if (start + 6 > buf.byteLength) break;
+                const id = dv.getUint16(start, true);
+                const len = dv.getUint32(start + 2, true);
+                if (len < 6 || start + len > buf.byteLength) break;
+
+                if (id === 0x4D4D || id === 0x3D3D) { parse(start+6, start+len); }
+                else if (id === 0x4000) {
+                    let skip = start + 6;
+                    while (skip < start+len && dv.getUint8(skip)) skip++;
+                    skip++;
+                    parse(skip, start+len);
+                }
+                else if (id === 0x4100) { currentMesh = {verts:[], faces:[]}; meshes.push(currentMesh); parse(start+6, start+len); }
+                else if (id === 0x4110 && currentMesh) {
+                    const count = dv.getUint16(start+6, true);
+                    let p = start+8;
+                    for (let i=0;i<count;i++) {
+                        currentMesh.verts.push(dv.getFloat32(p,true), dv.getFloat32(p+4,true), dv.getFloat32(p+8,true));
+                        p+=12;
+                    }
+                }
+                else if (id === 0x4120 && currentMesh) {
+                    const count = dv.getUint16(start+6, true);
+                    let p = start+8;
+                    for (let i=0;i<count;i++) {
+                        currentMesh.faces.push(dv.getUint16(p,true), dv.getUint16(p+2,true), dv.getUint16(p+4,true));
+                        p+=8;
+                    }
+                }
+                start += len;
+            }
+        }
+        parse(0, buf.byteLength);
+
+        // === PROCEDURAL TEXTURES ===
+
+        // Ash wood texture
+        function makeWoodTex() {
+            const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+            const ctx = c.getContext('2d');
+            // Ash wood base: warm medium-dark brown like the product photos
+            ctx.fillStyle = '#7A5C3A'; ctx.fillRect(0, 0, 512, 512);
+            const grd = ctx.createLinearGradient(0,0,0,512);
+            grd.addColorStop(0,'rgba(100,75,45,0.4)'); grd.addColorStop(0.5,'rgba(85,60,32,0.2)'); grd.addColorStop(1,'rgba(110,82,48,0.35)');
+            ctx.fillStyle = grd; ctx.fillRect(0,0,512,512);
+            // Grain lines
+            for (let i = 0; i < 300; i++) {
+                const y = Math.random() * 512;
+                const dark = Math.random() > 0.4;
+                ctx.strokeStyle = dark ? `rgba(40,25,10,${0.05+Math.random()*0.1})` : `rgba(150,120,75,${0.03+Math.random()*0.07})`;
+                ctx.lineWidth = 0.3 + Math.random() * 2;
+                ctx.beginPath(); ctx.moveTo(0, y);
+                for (let x = 0; x < 512; x += 8) ctx.lineTo(x, y + Math.sin(x*0.012+i)*3 + Math.sin(x*0.04)*1.5);
+                ctx.stroke();
+            }
+            // Knots
+            for (let i = 0; i < 2; i++) {
+                const kx = 100+Math.random()*300, ky = 100+Math.random()*300, kr = 6+Math.random()*12;
+                const g = ctx.createRadialGradient(kx,ky,0,kx,ky,kr);
+                g.addColorStop(0,'rgba(35,20,8,0.4)'); g.addColorStop(0.6,'rgba(60,40,18,0.2)'); g.addColorStop(1,'rgba(122,92,58,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(kx,ky,kr,kr*0.6,Math.random()*Math.PI,0,Math.PI*2); ctx.fill();
+            }
+            const tex = new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(2,2); return tex;
+        }
+
+        // Linen fabric texture
+        function makeLinenTex() {
+            const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+            const ctx = c.getContext('2d');
+            // Natural linen: light warm beige like product photos
+            ctx.fillStyle = '#D8CCB4'; ctx.fillRect(0, 0, 256, 256);
+            // Woven horizontal threads
+            for (let y = 0; y < 256; y += 2) {
+                ctx.strokeStyle = `rgba(160,140,110,${0.12+Math.random()*0.18})`;
+                ctx.lineWidth = 0.8 + Math.random() * 0.6;
+                ctx.beginPath(); ctx.moveTo(0, y + Math.random()*0.5); ctx.lineTo(256, y + Math.random()*0.5); ctx.stroke();
+            }
+            // Vertical threads
+            for (let x = 0; x < 256; x += 2) {
+                ctx.strokeStyle = `rgba(150,130,100,${0.1+Math.random()*0.15})`;
+                ctx.lineWidth = 0.6 + Math.random() * 0.5;
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + Math.random()*0.5, 256); ctx.stroke();
+            }
+            // Subtle noise
+            for (let i = 0; i < 4000; i++) {
+                const px = Math.random()*256, py = Math.random()*256;
+                ctx.fillStyle = `rgba(${110+Math.random()*50},${95+Math.random()*45},${75+Math.random()*35},${0.02+Math.random()*0.04})`;
+                ctx.fillRect(px, py, 1, 1);
+            }
+            const tex = new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(3,3); return tex;
+        }
+
+        // Bump maps
+        function makeBump(isLinen) {
+            const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#808080'; ctx.fillRect(0,0,128,128);
+            if (isLinen) {
+                for (let y=0;y<128;y+=2){ctx.strokeStyle=Math.random()>0.5?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(128,y);ctx.stroke();}
+                for (let x=0;x<128;x+=2){ctx.strokeStyle=Math.random()>0.5?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,128);ctx.stroke();}
+            } else {
+                for (let i=0;i<100;i++){const y=Math.random()*128;ctx.strokeStyle=Math.random()>0.5?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';ctx.lineWidth=0.5+Math.random();ctx.beginPath();ctx.moveTo(0,y);for(let x=0;x<128;x+=6)ctx.lineTo(x,y+Math.sin(x*0.03+i)*2);ctx.stroke();}
+            }
+            const tex = new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(isLinen?3:2,isLinen?3:2); return tex;
+        }
+
+        const woodMat = new THREE.MeshStandardMaterial({ map: makeWoodTex(), bumpMap: makeBump(false), bumpScale: 0.3, color: 0xA07848, roughness: 0.75, metalness: 0.01, side: THREE.DoubleSide });
+        const linenMat = new THREE.MeshStandardMaterial({ map: makeLinenTex(), bumpMap: makeBump(true), bumpScale: 0.12, color: 0xDDD0BA, roughness: 0.95, metalness: 0, side: THREE.DoubleSide });
+
+        // === BUILD SEPARATE MESHES ===
+        // Mesh index 7 = Group15 (sling/fabric surface - it has the curved shape with large Y span)
+        const group = new THREE.Group();
+
+        meshes.forEach((m, idx) => {
+            if (m.verts.length === 0) return;
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(m.verts, 3));
+            if (m.faces.length) geo.setIndex(m.faces);
+            geo.computeVertexNormals();
+
+            // Detect sling mesh: Group15 is the one spanning full Y range with curved shape
+            // It has 156 verts - identify by vertex count + Z range > 350
+            const zMin = Math.min(...m.verts.filter((_,i)=>i%3===2));
+            const zMax = Math.max(...m.verts.filter((_,i)=>i%3===2));
+            const zRange = zMax - zMin;
+            const isSling = m.verts.length/3 === 156 && zRange > 350;
+
+            const mesh = new THREE.Mesh(geo, isSling ? linenMat : woodMat);
+            group.add(mesh);
+        });
+
+        // Z-up to Y-up
+        group.rotation.x = -Math.PI / 2;
+
+        // Center + scale - fit inside view
+        const box = new THREE.Box3().setFromObject(group);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        group.position.sub(center);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const s = 2 / Math.max(size.x, size.y, size.z);
+        group.scale.setScalar(s);
+        group.position.multiplyScalar(s);
+
+        scene.add(group);
+        model = group;
+        console.log('3DS loaded:', meshes.length, 'meshes,', allVerts.length/3, 'verts,', allFaces.length/3, 'faces');
+    }).catch(e => console.error('Load error:', e));
+
+    function resize() {
+        const r = section.getBoundingClientRect();
+        renderer.setSize(r.width, r.height);
+        camera.aspect = r.width / r.height;
+        camera.updateProjectionMatrix();
+    }
+    resize();
+
+    // Button click: activate interactive mode
+    btn.addEventListener('click', () => {
+        isActive = true;
+        autoRotate = false;
+        wrap.classList.add('active');
+        overlay.classList.add('hidden');
+    });
+
+    // Mouse interaction (only when active)
+    canvas.addEventListener('mousedown', e => { if (!isActive) return; isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', e => {
+        if (!isDragging || !isActive) return;
+        const dx = e.clientX - prevMouse.x;
+        const dy = e.clientY - prevMouse.y;
+        targetRotY += dx * 0.008;
+        targetRotX += dy * 0.005;
+        targetRotX = Math.max(-1, Math.min(1, targetRotX));
+        prevMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    // Touch support
+    canvas.addEventListener('touchstart', e => { if (!isActive) return; isDragging = true; prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }, { passive: true });
+    canvas.addEventListener('touchend', () => isDragging = false);
+    canvas.addEventListener('touchmove', e => {
+        if (!isDragging || !isActive) return;
+        const dx = e.touches[0].clientX - prevMouse.x;
+        const dy = e.touches[0].clientY - prevMouse.y;
+        targetRotY += dx * 0.008;
+        targetRotX += dy * 0.005;
+        targetRotX = Math.max(-1, Math.min(1, targetRotX));
+        prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+
+    // Scroll zoom (when active)
+    canvas.addEventListener('wheel', e => {
+        if (!isActive) return;
+        e.preventDefault();
+        targetDist += e.deltaY * 0.005;
+        targetDist = Math.max(3, Math.min(6, targetDist));
+    }, { passive: false });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const rect = section.getBoundingClientRect();
+        if (rect.top > innerHeight || rect.bottom < 0) return;
+
+        if (autoRotate) targetRotY += 0.004;
+
+        rotY += (targetRotY - rotY) * 0.06;
+        rotX += (targetRotX - rotX) * 0.06;
+        camDist += (targetDist - camDist) * 0.06;
+
+        camera.position.x = Math.sin(rotY) * Math.cos(rotX) * camDist;
+        camera.position.y = Math.sin(rotX) * camDist;
+        camera.position.z = Math.cos(rotY) * Math.cos(rotX) * camDist;
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+    }
+    animate();
+    addEventListener('resize', resize);
 })();
 
 // ==================== LIGHTBOX & NAV ====================
