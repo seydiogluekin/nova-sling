@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA SLING - Zamansız Tasarım</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ========== RESET & BASE ========== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FAF7F2;
+            --cream-dark: #F0EBE3;
+            --dark: #2A2420;
+            --dark-soft: #3A3530;
+            --wood: #8B7355;
+            --wood-light: #A89478;
+            --green: #5A7A5E;
+            --green-soft: #6B8E6F;
+            --green-pale: #E8F0E9;
+            --text: #3A3530;
+            --text-light: #7A7570;
+            --white: #FFFFFF;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            background: var(--cream);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========== TYPOGRAPHY ========== */
+        h1, h2, h3, h4 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 300;
+            line-height: 1.15;
+        }
+
+        /* ========== NAVIGATION ========== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        nav.scrolled {
+            background: rgba(250, 247, 242, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem 3rem;
+            box-shadow: 0 1px 0 rgba(42, 36, 32, 0.08);
+        }
+
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.5s;
+        }
+
+        nav.scrolled .nav-logo {
+            color: var(--dark);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            transition: color 0.5s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: currentColor;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        nav.scrolled .nav-links a {
+            color: var(--text-light);
+        }
+
+        nav.scrolled .nav-links a:hover {
+            color: var(--dark);
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 40%;
+            transform: scale(1.05);
+            transition: transform 8s ease-out;
+        }
+
+        .hero.loaded .hero-bg img {
+            transform: scale(1);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(42, 36, 32, 0.15) 0%,
+                rgba(42, 36, 32, 0.1) 40%,
+                rgba(42, 36, 32, 0.55) 75%,
+                rgba(42, 36, 32, 0.8) 100%
+            );
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 3rem 5rem;
+            max-width: 800px;
+        }
+
+        .hero-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1.25rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s 0.5s forwards;
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            font-weight: 300;
+            color: var(--white);
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s 0.7s forwards;
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+            font-weight: 300;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 1s 0.9s forwards;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 2rem;
+            right: 3rem;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 1s 1.3s forwards;
+        }
+
+        .hero-scroll span {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            writing-mode: vertical-rl;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 50px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+            animation: scrollPulse 2s infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 1; transform: scaleY(1); }
+            50% { opacity: 0.3; transform: scaleY(0.6); }
+        }
+
+        /* ========== INTRO / DESCRIPTION SECTION ========== */
+        .intro {
+            padding: 8rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .intro-text {
+            padding-right: 2rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--wood);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-label::before {
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: var(--wood);
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 3.5vw, 3rem);
+            color: var(--dark);
+            margin-bottom: 2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .section-text {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--text-light);
+            line-height: 1.9;
+        }
+
+        .intro-image {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-image img {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .intro-image:hover img {
+            transform: scale(1.03);
+        }
+
+        .intro-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(139, 115, 85, 0.15);
+            pointer-events: none;
+        }
+
+        /* ========== FEATURES SECTION ========== */
+        .features {
+            background: var(--dark);
+            padding: 7rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to bottom, var(--cream), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .features-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .features .section-label {
+            color: var(--wood-light);
+        }
+
+        .features .section-label::before {
+            background: var(--wood-light);
+        }
+
+        .features .section-title {
+            color: var(--cream);
+            margin-bottom: 4rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--wood);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 1.5rem;
+            color: var(--wood-light);
+        }
+
+        .feature-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke-width: 1.2;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--cream);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.02em;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: rgba(240, 235, 227, 0.5);
+            line-height: 1.7;
+        }
+
+        /* ========== GALLERY SECTION ========== */
+        .gallery {
+            padding: 7rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-header {
+            margin-bottom: 4rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 1rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.04);
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(42, 36, 32, 0.5) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item-overlay span {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--white);
+        }
+
+        .gallery-item {
+            height: 420px;
+        }
+
+        .gallery-item.span-2 {
+            grid-column: span 2;
+        }
+
+        /* ========== SUSTAINABILITY SECTION ========== */
+        .sustainability {
+            background: var(--green);
+            padding: 7rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sustainability::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+        }
+
+        .sustainability::after {
+            content: '';
+            position: absolute;
+            bottom: -300px;
+            left: -200px;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+        }
+
+        .sustainability-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sustainability .section-label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sustainability .section-label::before {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .sustainability .section-title {
+            color: var(--white);
+            font-size: clamp(2rem, 3vw, 2.75rem);
+        }
+
+        .sustainability .section-text {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .sustain-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sustain-stat {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .sustain-stat:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sustain-icon {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sustain-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke-width: 1.2;
+        }
+
+        .sustain-stat h4 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 0.35rem;
+        }
+
+        .sustain-stat p {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.6;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--dark);
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            color: var(--cream);
+        }
+
+        .footer-info {
+            font-size: 0.7rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: rgba(240, 235, 227, 0.35);
+        }
+
+        /* ========== SCROLL REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+        .reveal-delay-6 { transition-delay: 0.6s; }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== LIGHTBOX ========== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(42, 36, 32, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            cursor: pointer;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lightbox.active img {
+            transform: scale(1);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s;
+        }
+
+        .lightbox-close:hover {
+            color: white;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .intro {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                padding: 5rem 2rem;
+            }
+
+            .intro-text {
+                padding-right: 0;
+            }
+
+            .intro-image img {
+                height: 450px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .gallery-item {
+                height: 350px;
+            }
+
+            .gallery-item.span-2 {
+                grid-column: span 2;
+            }
+
+            .sustainability-inner {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            nav.scrolled {
+                padding: 0.75rem 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                padding: 0 1.5rem 3.5rem;
+            }
+
+            .hero-scroll {
+                display: none;
+            }
+
+            .intro {
+                padding: 4rem 1.5rem;
+            }
+
+            .intro-image img {
+                height: 350px;
+            }
+
+            .features {
+                padding: 5rem 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .gallery {
+                padding: 5rem 1.5rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-item {
+                height: 280px;
+            }
+
+            .gallery-item.span-2 {
+                grid-column: span 1;
+            }
+
+            .sustainability {
+                padding: 5rem 1.5rem;
+            }
+
+            footer {
+                padding: 2rem 1.5rem;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav id="navbar">
+        <a href="#" class="nav-logo">NOVA SLING</a>
+        <ul class="nav-links">
+            <li><a href="#about">Tasarım</a></li>
+            <li><a href="#features">Özellikler</a></li>
+            <li><a href="#gallery">Galeri</a></li>
+            <li><a href="#sustainability">Sürdürülebilirlik</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <img src="images/exhibition.png" alt="NOVA SLING - Sergi Görünümü" loading="eager">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-label">Ash &amp; Linen Collection</p>
+            <h1 class="hero-title">NOVA SLING</h1>
+            <p class="hero-subtitle">Zamansız tasarımın ve doğal malzemenin dengesi.</p>
+        </div>
+        <div class="hero-scroll">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- INTRODUCTION -->
+    <section class="intro" id="about">
+        <div class="intro-text">
+            <div class="section-label reveal">Tasarım Felsefesi</div>
+            <h2 class="section-title reveal reveal-delay-1">Minimum Form,<br>Maksimum Konfor</h2>
+            <p class="section-text reveal reveal-delay-2">
+                Masif dişbudak ahşap ve doğal keten kumaşın bir araya geldiği bu oturma elemanı, minimum form ile maksimum konfor sunar. Hafif, demonte yapısı sayesinde farklı yaşam alanlarına kolayca adapte olurken, sürdürülebilir malzeme seçimiyle uzun ömürlü bir kullanım deneyimi sağlar.
+            </p>
+            <br>
+            <p class="section-text reveal reveal-delay-3">
+                NOVA SLING, geleneksel ahşap geçme tekniklerini modern bir dil ile yeniden yorumlar. Taşıyıcı ahşap strüktür ile gerilimli kumaş yüzey arasındaki ilişki, hem ergonomik hem de estetik bir oturma deneyimi oluşturur. Parçalanabilir yapısı sayesinde taşınabilir, tamir edilebilir ve yeniden üretilebilir bir ürün yaklaşımı sunar.
+            </p>
+        </div>
+        <div class="intro-image reveal reveal-delay-2">
+            <img src="images/side-view.png" alt="NOVA SLING - Yandan Görünüm">
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="features-inner">
+            <div class="section-label reveal">Özellikler</div>
+            <h2 class="section-title reveal reveal-delay-1">Öne Çıkan<br>Tasarım Detayları</h2>
+            <div class="features-grid">
+
+                <div class="feature-card reveal reveal-delay-1">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M8 40V8h4v28h24V8h4v32"/>
+                            <path d="M16 16h16M16 22h16"/>
+                        </svg>
+                    </div>
+                    <h3>Masif Dişbudak Ahşap</h3>
+                    <p>Taşıyıcı sistem, dayanıklı ve doğal dokulu masif dişbudak ahşaptan üretilmiştir.</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-2">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M6 38c8-6 12-18 18-24s12-4 18 0"/>
+                            <path d="M6 42c8-6 12-18 18-24s12-4 18 0" opacity="0.4"/>
+                        </svg>
+                    </div>
+                    <h3>Doğal Keten Sling</h3>
+                    <p>Oturma yüzeyi, gerilimli doğal keten kumaştan oluşturulmuş sling sistemiyle tasarlanmıştır.</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <rect x="8" y="8" width="14" height="14" rx="1"/>
+                            <rect x="26" y="8" width="14" height="14" rx="1"/>
+                            <rect x="8" y="26" width="14" height="14" rx="1"/>
+                            <rect x="26" y="26" width="14" height="14" rx="1"/>
+                        </svg>
+                    </div>
+                    <h3>Demonte &amp; Modüler</h3>
+                    <p>Parçalanabilir kurgusu, taşınabilirlik ve esneklik sağlar; farklı alanlara kolayca uyum sağlar.</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-4">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M14 8v32M34 8v32"/>
+                            <path d="M14 18h20M14 28h20"/>
+                            <circle cx="14" cy="18" r="2.5" fill="currentColor"/>
+                            <circle cx="34" cy="18" r="2.5" fill="currentColor"/>
+                            <circle cx="14" cy="28" r="2.5" fill="currentColor"/>
+                            <circle cx="34" cy="28" r="2.5" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h3>Ahşap Geçme Detayı</h3>
+                    <p>Geleneksel geçme teknikleri ve mekanik bağlantı detayları, güçlü ve sürdürülebilir bir yapı oluşturur.</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-5">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M24 6l-6 14h12L24 6z"/>
+                            <path d="M24 42V20"/>
+                            <path d="M16 34l8 8 8-8" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3>Hafif Yapı</h3>
+                    <p>Minimum ağırlıkla maksimum dayanıklılık; taşınabilir ve pratik kullanım sunar.</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-6">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <circle cx="24" cy="24" r="16"/>
+                            <path d="M24 8a16 16 0 0 1 0 32" fill="none" stroke-dasharray="4 3"/>
+                            <path d="M18 24h12M24 18v12"/>
+                        </svg>
+                    </div>
+                    <h3>Zamansız Tasarım</h3>
+                    <p>Minimal ve evrensel tasarım dili, trendlerden bağımsız olarak her mekana uyum sağlar.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="gallery" id="gallery">
+        <div class="gallery-header">
+            <div class="section-label reveal">Galeri</div>
+            <h2 class="section-title reveal reveal-delay-1">Detaylarda<br>Saklanan Hikâye</h2>
+        </div>
+        <div class="gallery-grid">
+            <div class="gallery-item span-2 reveal">
+                <img src="images/front-view.png" alt="NOVA SLING - Önden Görünüm">
+                <div class="gallery-item-overlay">
+                    <span>Önden görünüm</span>
+                </div>
+            </div>
+            <div class="gallery-item reveal reveal-delay-1">
+                <img src="images/detail-view.png" alt="NOVA SLING - Detay Görünüm">
+                <div class="gallery-item-overlay">
+                    <span>Yapısal detay</span>
+                </div>
+            </div>
+            <div class="gallery-item reveal reveal-delay-1">
+                <img src="images/side-detail.png" alt="NOVA SLING - Yakın Çekim">
+                <div class="gallery-item-overlay">
+                    <span>Ahşap geçme yakın çekim</span>
+                </div>
+            </div>
+            <div class="gallery-item reveal reveal-delay-2">
+                <img src="images/detail-joinery.png" alt="NOVA SLING - Birleşim Detayları">
+                <div class="gallery-item-overlay">
+                    <span>Birleşim detayları</span>
+                </div>
+            </div>
+            <div class="gallery-item reveal reveal-delay-3">
+                <img src="images/exhibition.png" alt="NOVA SLING - Sergi">
+                <div class="gallery-item-overlay">
+                    <span>Sergi görünümü</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUSTAINABILITY -->
+    <section class="sustainability" id="sustainability">
+        <div class="sustainability-inner">
+            <div>
+                <div class="section-label reveal">Sürdürülebilirlik</div>
+                <h2 class="section-title reveal reveal-delay-1">Döngüsel Kullanım,<br>Düşük Çevresel Etki</h2>
+                <p class="section-text reveal reveal-delay-2">
+                    Doğal malzemelerle üretilen NOVA SLING, uzun ömürlü kullanım ve düşük çevresel etki prensibiyle tasarlanmıştır. Değiştirilebilir kumaş yüzeyi ve sökülebilir bağlantı sistemi sayesinde ürün, lineer tüketim yerine döngüsel kullanım modelini destekler.
+                </p>
+            </div>
+            <div class="sustain-visual">
+                <div class="sustain-stat reveal reveal-delay-1">
+                    <div class="sustain-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M24 4C13 4 4 13 4 24s9 20 20 20 20-9 20-20"/>
+                            <path d="M44 4L24 24"/>
+                            <path d="M34 4h10v10"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Değiştirilebilir Kumaş</h4>
+                        <p>Sling oturma yüzeyi, ürün ömrünün sonuna kadar yenilenebilir ve değiştirilebilir şekilde tasarlanmıştır.</p>
+                    </div>
+                </div>
+                <div class="sustain-stat reveal reveal-delay-2">
+                    <div class="sustain-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M8 24h8l4-8 4 16 4-12 4 4h8"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Sökülebilir Bağlantı</h4>
+                        <p>Mekanik bağlantı sistemi, ürünün tamamen parçalanıp yeniden monte edilmesine olanak tanır.</p>
+                    </div>
+                </div>
+                <div class="sustain-stat reveal reveal-delay-3">
+                    <div class="sustain-icon">
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                            <path d="M24 4v8M24 36v8M4 24h8M36 24h8"/>
+                            <circle cx="24" cy="24" r="8"/>
+                            <path d="M10 10l6 6M32 32l6 6M38 10l-6 6M16 32l-6 6"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Doğal Malzeme</h4>
+                        <p>Tamamen doğal ve yenilenebilir malzemeler, çevresel ayak izini en aza indirir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <span class="footer-brand">NOVA SLING</span>
+            <span class="footer-info">Ash &amp; Linen Series &mdash; 2025</span>
+        </div>
+    </footer>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <svg class="lightbox-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+        <img src="" alt="Buyutulmus gorsel">
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        const hero = document.getElementById('hero');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 80) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Hero load animation
+        window.addEventListener('load', () => {
+            hero.classList.add('loaded');
+        });
+
+        // Scroll reveal with Intersection Observer
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -60px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // Lightbox
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = lightbox.querySelector('img');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+
+        galleryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const img = item.querySelector('img');
+                lightboxImg.src = img.src;
+                lightboxImg.alt = img.alt;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
